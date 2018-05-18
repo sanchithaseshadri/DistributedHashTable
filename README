@@ -1,0 +1,19 @@
+README
+
+CHORD DHT DESIGN:
+
+ENTITIES:
+1. nodes in a circular space - 16
+2. client - the thing that's user outside Chord requesting to store data in Chord DHT
+3. supernode - a global entity to keep track of all the nodes, their ids, ips and ports, their status (online / offline) and finger tables
+
+DESIGN CHOICES MADE:
+1. every node is a thread
+2. each node requires a global id - this becomes the key to hash values with, which is determined using SHA-1 encryption
+3. Security risk - when the Chord DHT is just initialized, it waits for all N nodes to register. While it waits, any node that contacts it at the address and port can become part of the DHT, intruding on private data - this is a threat. To overcome this, the implementation will use a security key for all communication amongst the entities. If any node receives messages without the security key, it will disregard the message and do nothing.
+
+USAGE:
+1. Initialize global DHT master - keeps track of all the nodes that join and the finger table for each
+2. Initialize all nodes part of the DHT - have all nodes registered - until this happens, values cannot be hashed into the DHT since their finger tables are unknown.
+3. Once the nodes are registered, all the several clients can start hashing data simultaneously
+4. Some process internal to a node might cause it to spiral into a shutdown or make it go offline - to simulate this effect, a node can be "turned off" and all its data will be transferred to a successor
